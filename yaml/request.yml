@@ -1,0 +1,20 @@
+---
+todo:
+  url: http://127.0.0.1:8100
+  params:
+    a: 100
+rust:
+  method: GET
+  url: http://127.0.0.1:8100/req_r1
+  headers:
+    user-agent: Aloha
+  params:
+    hello: world
+rust2:
+  url: http://127.0.0.1:8100/req_r1
+  method: GET
+  params:
+    a: 1
+    b: 2
+    c[0]: 3
+    c[1]: 4
