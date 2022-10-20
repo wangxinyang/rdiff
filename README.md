@@ -1,12 +1,12 @@
 # rdiff
-Send HTTP request by parsing command line parameters or YAML files and compare the response result and display the comparison result. 
+Send HTTP request by parsing command line parameters or YAML files and compare the response result and display the comparison result.
 
 
 
 > Command
 
 ```
-rdiff add -h 
+rdiff add -h
 
 Usage: rdiff add [OPTIONS] --config <CONFIG> --profile <PROFILE>
 
@@ -71,4 +71,3 @@ rust:
 5   5    | }
 ```
 <img width="1395" alt="image" src="https://s1.imagehub.cc/images/2022/10/19/1325a811388db5d27.png">
-
