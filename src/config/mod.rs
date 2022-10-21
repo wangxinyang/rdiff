@@ -16,7 +16,7 @@ use std::str::FromStr;
 use tokio::fs;
 use url::Url;
 
-pub use rdiff::{DiffConfig, DiffProfile, ResponseProfile};
+pub use self::rdiff::{DiffConfig, DiffProfile, ResponseProfile};
 pub use rreq::*;
 
 #[async_trait]
@@ -278,4 +278,66 @@ fn empty_json_value(v: &Option<serde_json::Value>) -> bool {
     v.as_ref().map_or(true, |v| {
         v.is_null() || (v.is_object() && v.as_object().unwrap().is_empty())
     })
+}
+
+#[cfg(test)]
+mod tests {
+
+    use http::StatusCode;
+    use mockito::{mock, Mock};
+
+    use super::*;
+
+    #[tokio::test]
+    async fn request_profile_send_should_work() {
+        let _m = build_mock_obj("/test1?a=1&b=2", json!({"id" : 1, "title" : "todo"}));
+
+        let res = send_get_response(
+            "test1",
+            Some(json!({"a" : 1, "b" : 2})),
+            &Default::default(),
+        )
+        .await
+        .into_inner();
+        assert_eq!(res.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn request_profile_send_with_extra_params_should_work() {
+        let _m = build_mock_obj("/test1?a=1&b=2", json!({"id" : 1, "title" : "todo"}));
+
+        let extra_args = ExtraConfigs {
+            query: vec![("b".into(), "2".into())],
+            ..Default::default()
+        };
+        let res = send_get_response("test1", Some(json!({"a" : 1, "b" : 3})), &extra_args)
+            .await
+            .into_inner();
+        assert_eq!(res.status(), StatusCode::OK);
+    }
+
+    fn build_mock_obj(path_query: &str, body: serde_json::Value) -> Mock {
+        mock("GET", path_query)
+            .with_status(200)
+            .with_header("content-type", "application/json")
+            .with_body(serde_json::to_string(&body).unwrap())
+            .create()
+    }
+
+    async fn send_get_response(
+        path: &str,
+        params: Option<serde_json::Value>,
+        extar_configs: &ExtraConfigs,
+    ) -> ResponseExt {
+        let url = format!("{}/{}", &mockito::server_url(), path);
+        let profile = RequestProfile::new(
+            Url::parse(&url).unwrap(),
+            Method::GET,
+            params,
+            HeaderMap::new(),
+            None,
+        );
+
+        profile.send(extar_configs).await.unwrap()
+    }
 }
