@@ -17,7 +17,8 @@ rust:
     url: http://127.0.0.1:8100/req_r1
     headers:
       user-agent: Aloha
-    params: 1111
+    params:
+      hello: world
   request2:
     method: GET
     url: http://127.0.0.1:8100/req_r2

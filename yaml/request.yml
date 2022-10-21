@@ -8,8 +8,7 @@ rust:
   url: http://127.0.0.1:8100/req_r1
   headers:
     user-agent: Aloha
-  params:
-    hello: world
+  params: test
 rust2:
   url: http://127.0.0.1:8100/req_r1
   method: GET
