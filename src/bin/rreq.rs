@@ -3,8 +3,8 @@ use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Input;
 use rdiff::{
-    get_body_text, get_header_text, get_status_text, highlighting_text, Commands, DiffCli,
-    ExtraConfigs, LoadConfig, RequestConfig, RequestProfile, RunArgs,
+    get_body_text, get_header_text, get_status_text, highlighting_text, process_error_output,
+    Commands, DiffCli, ExtraConfigs, LoadConfig, RequestConfig, RequestProfile, RunArgs,
 };
 use std::fmt::Write as _;
 use std::io::Write as _;
@@ -13,12 +13,12 @@ use std::io::Write as _;
 async fn main() -> Result<()> {
     // get config
     let config = DiffCli::parse();
-    match config.command {
-        Commands::Add(args) => run(args).await?,
-        Commands::Parse => parse().await?,
+    let result = match config.command {
+        Commands::Add(args) => run(args).await,
+        Commands::Parse => parse().await,
         _ => panic!("Invalid command"),
     };
-    Ok(())
+    process_error_output(result)
 }
 
 async fn run(args: RunArgs) -> Result<()> {

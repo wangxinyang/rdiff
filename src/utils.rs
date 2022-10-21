@@ -2,6 +2,7 @@ use anyhow::Result;
 use console::{style, Style};
 use similar::{ChangeTag, TextDiff};
 use std::fmt::{self, Write};
+use std::io::Write as _;
 use syntect::easy::HighlightLines;
 use syntect::highlighting::ThemeSet;
 use syntect::parsing::SyntaxSet;
@@ -72,4 +73,20 @@ pub fn highlighting_text(text: &str, extensions: &str) -> Result<String> {
     }
 
     Ok(output)
+}
+
+pub fn process_error_output(result: Result<()>) -> Result<()> {
+    match result {
+        Ok(_) => {}
+        Err(err) => {
+            let mut stderr = std::io::stderr().lock();
+            if atty::is(atty::Stream::Stderr) {
+                let s = Style::new().red();
+                write!(stderr, "{}", s.apply_to(format!("{:?}", err)))?
+            } else {
+                write!(stderr, "{:?}", err)?
+            }
+        }
+    }
+    Ok(())
 }
